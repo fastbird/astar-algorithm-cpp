@@ -1,28 +1,4 @@
-/*
-A* Algorithm Implementation using STL is
-Copyright (C)2001-2005 Justin Heyes-Jones
-
-Permission is given by the author to freely redistribute and 
-include this code in any program as long as this credit is 
-given where due.
- 
-  COVERED CODE IS PROVIDED UNDER THIS LICENSE ON AN "AS IS" BASIS, 
-  WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, 
-  INCLUDING, WITHOUT LIMITATION, WARRANTIES THAT THE COVERED CODE 
-  IS FREE OF DEFECTS, MERCHANTABLE, FIT FOR A PARTICULAR PURPOSE
-  OR NON-INFRINGING. THE ENTIRE RISK AS TO THE QUALITY AND 
-  PERFORMANCE OF THE COVERED CODE IS WITH YOU. SHOULD ANY COVERED 
-  CODE PROVE DEFECTIVE IN ANY RESPECT, YOU (NOT THE INITIAL 
-  DEVELOPER OR ANY OTHER CONTRIBUTOR) ASSUME THE COST OF ANY 
-  NECESSARY SERVICING, REPAIR OR CORRECTION. THIS DISCLAIMER OF 
-  WARRANTY CONSTITUTES AN ESSENTIAL PART OF THIS LICENSE. NO USE 
-  OF ANY COVERED CODE IS AUTHORIZED HEREUNDER EXCEPT UNDER
-  THIS DISCLAIMER.
- 
-  Use at your own risk!
-
-*/
-
+#pragma once
 #ifndef STLASTAR_H
 #define STLASTAR_H
 // used for text debugging
@@ -53,13 +29,13 @@ using namespace std;
 #endif
 
 template <class T> class AStarState;
-
+class FWorldFragment;
 // The AStar search class. UserState is the users state space type
 template <class UserState> class AStarSearch
 {
 
 public: // data
-
+	FWorldFragment* BaseFragment;
 	enum
 	{
 		SEARCH_STATE_NOT_INITIALISED,
@@ -118,15 +94,17 @@ public: // methods
 
 
 	// constructor just initialises private data
-	AStarSearch() :
-		m_State( SEARCH_STATE_NOT_INITIALISED ),
-		m_CurrentSolutionNode( NULL ),
+	AStarSearch(FWorldFragment* baseFragment) 
+		: BaseFragment(baseFragment)
+		, m_State( SEARCH_STATE_NOT_INITIALISED )
+		, m_CurrentSolutionNode( NULL )
 #if USE_FSA_MEMORY
-		m_FixedSizeAllocator( 1000 ),
+		, m_FixedSizeAllocator( 1000 )
 #endif
-		m_AllocateNodeCount(0),
-		m_CancelRequest( false )
+		, m_AllocateNodeCount(0)
+		, m_CancelRequest( false )
 	{
+		assert(BaseFragment);
 	}
 
 	AStarSearch( int MaxNodes ) :
@@ -165,7 +143,7 @@ public: // methods
 		// The user only needs fill out the state information
 
 		m_Start->g = 0; 
-		m_Start->h = m_Start->m_UserState.GoalDistanceEstimate( m_Goal->m_UserState );
+		m_Start->h = m_Start->m_UserState.Distance( m_Goal->m_UserState );
 		m_Start->f = m_Start->g + m_Start->h;
 		m_Start->parent = 0;
 
@@ -350,7 +328,7 @@ public: // methods
 
 				(*successor)->parent = n;
 				(*successor)->g = newg;
-				(*successor)->h = (*successor)->m_UserState.GoalDistanceEstimate( m_Goal->m_UserState );
+				(*successor)->h = (*successor)->m_UserState.Distance( m_Goal->m_UserState );
 				(*successor)->f = (*successor)->g + (*successor)->h;
 
 				// Successor in closed list
@@ -438,7 +416,7 @@ public: // methods
 	// when expanding the search frontier
 	bool AddSuccessor( UserState &State )
 	{
-		Node *node = AllocateNode();
+		Node *	 = AllocateNode();
 
 		if( node )
 		{
@@ -821,7 +799,7 @@ template <class T> class AStarState
 {
 public:
 	virtual ~AStarState() {}
-	virtual float GoalDistanceEstimate( T &nodeGoal ) = 0; // Heuristic function which computes the estimated cost to the goal node
+	virtual float Distance( T &nodeGoal ) = 0; // Heuristic function which computes the estimated cost to the goal node
 	virtual bool IsGoal( T &nodeGoal ) = 0; // Returns true if this node is the goal node
 	virtual bool GetSuccessors( AStarSearch<T> *astarsearch, T *parent_node ) = 0; // Retrieves all successors to this node and adds them via astarsearch.addSuccessor()
 	virtual float GetCost( T &successor ) = 0; // Computes the cost of travelling from this node to the successor node
@@ -831,3 +809,27 @@ public:
 #endif
 
    
+/*
+A* Algorithm Implementation using STL is
+Copyright (C)2001-2005 Justin Heyes-Jones
+
+Permission is given by the author to freely redistribute and
+include this code in any program as long as this credit is
+given where due.
+
+  COVERED CODE IS PROVIDED UNDER THIS LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED,
+  INCLUDING, WITHOUT LIMITATION, WARRANTIES THAT THE COVERED CODE
+  IS FREE OF DEFECTS, MERCHANTABLE, FIT FOR A PARTICULAR PURPOSE
+  OR NON-INFRINGING. THE ENTIRE RISK AS TO THE QUALITY AND
+  PERFORMANCE OF THE COVERED CODE IS WITH YOU. SHOULD ANY COVERED
+  CODE PROVE DEFECTIVE IN ANY RESPECT, YOU (NOT THE INITIAL
+  DEVELOPER OR ANY OTHER CONTRIBUTOR) ASSUME THE COST OF ANY
+  NECESSARY SERVICING, REPAIR OR CORRECTION. THIS DISCLAIMER OF
+  WARRANTY CONSTITUTES AN ESSENTIAL PART OF THIS LICENSE. NO USE
+  OF ANY COVERED CODE IS AUTHORIZED HEREUNDER EXCEPT UNDER
+  THIS DISCLAIMER.
+
+  Use at your own risk!
+
+*/
