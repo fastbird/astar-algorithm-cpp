@@ -29,13 +29,11 @@ using namespace std;
 #endif
 
 template <class T> class AStarState;
-class FWorldFragment;
 // The AStar search class. UserState is the users state space type
 template <class UserState> class AStarSearch
 {
-
+	void* ExtraData;
 public: // data
-	FWorldFragment* BaseFragment;
 	enum
 	{
 		SEARCH_STATE_NOT_INITIALISED,
@@ -94,8 +92,8 @@ public: // methods
 
 
 	// constructor just initialises private data
-	AStarSearch(FWorldFragment* baseFragment) 
-		: BaseFragment(baseFragment)
+	AStarSearch(void* extraData) 
+		: ExtraData(extraData)
 		, m_State( SEARCH_STATE_NOT_INITIALISED )
 		, m_CurrentSolutionNode( NULL )
 #if USE_FSA_MEMORY
@@ -239,7 +237,7 @@ public: // methods
 
 			// User provides this functions and uses AddSuccessor to add each successor of
 			// node 'n' to m_Successors
-			bool ret = n->m_UserState.GetSuccessors( this, n->parent ? &n->parent->m_UserState : NULL ); 
+			bool ret = n->m_UserState.GetSuccessors( this, n->parent ? &n->parent->m_UserState : NULL, ExtraData ); 
 
 			if( !ret )
 			{
@@ -414,9 +412,9 @@ public: // methods
 
 	// User calls this to add a successor to a list of successors
 	// when expanding the search frontier
-	bool AddSuccessor( UserState &State )
+	bool AddSuccessor( const UserState &&State )
 	{
-		Node *	 = AllocateNode();
+		Node *node = AllocateNode();
 
 		if( node )
 		{
