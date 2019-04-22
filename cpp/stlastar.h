@@ -102,7 +102,7 @@ public: // methods
 		, m_AllocateNodeCount(0)
 		, m_CancelRequest( false )
 	{
-		assert(BaseFragment);
+		assert(ExtraData);
 	}
 
 	AStarSearch( int MaxNodes ) :
@@ -412,7 +412,7 @@ public: // methods
 
 	// User calls this to add a successor to a list of successors
 	// when expanding the search frontier
-	bool AddSuccessor( const UserState &&State )
+	bool AddSuccessor( const UserState& State )
 	{
 		Node *node = AllocateNode();
 
