@@ -57,9 +57,9 @@ public: // data
 			Node *parent; // used during the search to record the parent of successor nodes
 			Node *child; // used after the search for the application to view the search in reverse
 			
-			float g; // cost of this node + it's predecessors
-			float h; // heuristic estimate of distance to goal
-			float f; // sum of cumulative cost of predecessors and self and heuristic
+			Real g; // cost of this node + it's predecessors
+			Real h; // heuristic estimate of distance to goal
+			Real f; // sum of cumulative cost of predecessors and self and heuristic
 
 			Node() :
 				parent( 0 ),
@@ -265,7 +265,7 @@ public: // methods
 			{
 
 				// 	The g value for this successor ...
-				float newg = n->g + n->m_UserState.GetCost( (*successor)->m_UserState );
+				Real newg = n->g + n->m_UserState.GetCost( (*successor)->m_UserState );
 
 				// Now we need to find whether the node is on the open or closed lists
 				// If it is but the node that is already on them is better (lower g)
@@ -462,6 +462,17 @@ public: // methods
 
 	// Functions for traversing the solution
 
+	size_t GetSolutionLength()
+	{
+		size_t l = 0;
+		auto start = m_Start;
+		while (start)
+		{
+			l++;
+			start = start->child;
+		}
+		return l;
+	}
 	// Get start node
 	UserState *GetSolutionStart()
 	{
